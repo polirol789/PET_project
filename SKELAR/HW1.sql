@@ -212,22 +212,29 @@ SELECT
     spend / NULLIF(registrations, 0)
   , 2) AS cac,
 
-  -- ── BONUS: LTV/CAC ratio ──────────────────────────────────
-  ROUND(
-    CASE
-      WHEN source = 'TikTok'
-        THEN 8.50 / NULLIF(spend / NULLIF(registrations, 0), 0)
+  -- ── LTV/CAC ───────────────────────────────────────────────
 
-      WHEN source = 'META'
-        THEN 6.20 / NULLIF(spend / NULLIF(registrations, 0), 0)
+-- Варіант 1: LTV вирахуваний за таблицями orders + product_events)
+-- Використовується у маркетинговому звіті як реальний показник
+ROUND(
+  CASE LOWER(source)
+    WHEN 'tiktok' THEN 69.73
+    WHEN 'meta'   THEN 77.28
+    WHEN 'google' THEN 92.30
+  END
+  / NULLIF(spend / NULLIF(registrations, 0), 0)
+, 2) AS ltv_cac_calculated,
 
-      WHEN source = 'Google'
-        THEN 12.40 / NULLIF(spend / NULLIF(registrations, 0), 0)
-
-      ELSE NULL
-    END
-  , 2) AS ltv_cac_ratio
-
+-- Варіант 2: LTV з умови завдання 4 (задані константи для порівняння)
+-- Використовується виключно для відповіді на Q4
+ROUND(
+  CASE LOWER(source)
+    WHEN 'tiktok' THEN 8.50
+    WHEN 'meta'   THEN 6.20
+    WHEN 'google' THEN 12.40
+  END
+  / NULLIF(spend / NULLIF(registrations, 0), 0)
+, 2) AS ltv_cac_task4
 FROM combined_report
 
 -- ============================================================
